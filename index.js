@@ -8,7 +8,7 @@ import cors from 'cors';
 const app = express();
 app.use(express.json());
 const corsOptions = {
-    origin: 'https://wonderful-cendol-7963d5.netlify.app/',
+    origin: 'https://mysql-app-1dc5cb1ca38d.herokuapp.com/',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204,
@@ -17,14 +17,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-const db1 = mysql.createConnection({
+const db2 = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: "",
     database: 'test',
 })
 
-const db2 = mysql.createConnection({
+const db22 = mysql.createConnection({
     host: 'kcpgm0ka8vudfq76.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
     user: 'bu85hizl1m472sbb',
     password: "h3ez5n4iyfhqe20f",
@@ -90,7 +90,6 @@ app.get('/exams', (req, res) => {
         if (err) {
             return res.json({Error: "Error"});
         }
-        console.log("data exams ", data)
         return res.json(data);
     })
 })
