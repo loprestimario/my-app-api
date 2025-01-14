@@ -8,7 +8,7 @@ import cors from 'cors';
 const app = express();
 app.use(express.json());
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: 'https://wonderful-cendol-7963d5.netlify.app/',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204,
@@ -23,6 +23,15 @@ const db1 = mysql.createConnection({
     password: "",
     database: 'test',
 })
+
+const db2 = mysql.createConnection({
+    host: 'kcpgm0ka8vudfq76.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
+    user: 'bu85hizl1m472sbb',
+    password: "h3ez5n4iyfhqe20f",
+    database: 'ftlbdo6z7a2rttg2',
+})
+
+//mysql://bu85hizl1m472sbb:h3ez5n4iyfhqe20f@kcpgm0ka8vudfq76.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/ftlbdo6z7a2rttg2
 
 const db = mysql.createConnection({
     host: 'sql5.freesqldatabase.com',
