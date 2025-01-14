@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "startDev": "nodemon index.js",
-    "proxy" : "localhost:3000"
+    "proxy": "https://mysql-app-1dc5cb1ca38d.herokuapp.com/"
   },
   "keywords": [],
   "author": "",
