@@ -6,7 +6,10 @@ import cors from 'cors';
 
 
 const app = express();
+
 app.use(express.json());
+
+
 const corsOptions = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -70,9 +73,12 @@ app.get('/ambulatori', (req, res) => {
 // get body part by ambulatorio id
 app.get('/body', (req, res) => {
     console.log("reeeeeeeee" ,req.query.id)
-    const q =  req.query.id
+    const q =  req.query.id;
+    let esameDesc = ""
+    if(req.query.searchText)
+     esameDesc = ' and esami.descrizione ' + " LIKE " + "\'%" + req.query.searchText  + "%\'" ;
     // const sql = 'SELECT * FROM `amb_esam` JOIN ambulatori JOIN esami WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and ambulatori.id = ' + q;
-    const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id =' + q;
+    const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id = ' + q + esameDesc;
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: "Error"});
@@ -128,15 +134,11 @@ app.get('/esami_selezionati', (req, res) => {
 })
 
 
-app.post('/create', (req, res) => {
-    const sql = 'INSERT INTO prova (nome, cognome, stato) VALUES (?)';
-    const values = [
-        req.body.nome,
-        req.body.cognome,
-        req.body.stato
-    ]
+app.post('/insert/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = "INSERT INTO `esami_selezionati` (`id_esame`) VALUES " + "(\'" + id + "\')";
 
-    db.query(sql, [values],(err, result) => {
+    db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: "Error"});
         }
@@ -145,15 +147,10 @@ app.post('/create', (req, res) => {
 })
 
 app.delete('/delete/:id', (req, res) => {
-
     const id = req.params.id;
-    console.log("id     ddddddddddd   ", id)
-
     const sql = "delete from esami_selezionati where esami_selezionati.id_esame = " + id;
 
-    console.log(sql);
-
-    db.query(sql, [id],(err, result) => {
+    db.query(sql,(err, data) => {
         if (err) {
             return res.json({Error: "Error"});
         }
@@ -169,7 +166,7 @@ app.post('/update/:id', (req, res) => {
         req.body.stato
     ]
 
-    db.sql(sql, [values],(err, data) => {
+    db.query(sql, [values],(err, data) => {
         if (err) {
             return res.json({Error: "Error"});
         }
