@@ -165,6 +165,6 @@ app.post('/update/:id', (req, res) => {
     })
 })
 
-app.listen(3040, () => {
+app.listen(process.env.PORT | 3040, () => {
     console.log("Server started on port 3000");
 })
