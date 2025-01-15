@@ -41,7 +41,7 @@ app.get('/body', (req, res) => {
     const q =  req.query.id;
     let esameDesc = ""
     if(req.query.searchText)
-     esameDesc = ' and esami.descrizione ' + " LIKE " + "\'%" + req.query.searchText  + "%\'" ;
+     esameDesc = ' and esami.`'+ req.query.searchType  + "` LIKE " + "\'%" + req.query.searchText  + "%\'" ;
     const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id = ' + q + esameDesc;
     db.query(sql, (err, data) => {
         if (err) {
@@ -67,10 +67,9 @@ app.get('/exams', (req, res) => {
 
 
 app.get('/search', (req, res) => {
-    const codiceMin = req.query.id;
+    const text = req.query.text;
     const typeSearch = req.query.typeSearch;
-    const sql = "SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and " + "`" + typeSearch +  "`" + " LIKE " + "\'%" + codiceMin + "%\'";
-    console.log(sql)
+    const sql = "SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and " + "`" + typeSearch +  "`" + " LIKE " + "\'%" + text + "%\'";
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: err});
@@ -80,11 +79,7 @@ app.get('/search', (req, res) => {
 })
 
 app.get('/esami_selezionati', (req, res) => {
-    const codiceMin = req.query.id;
-    const typeSearch = req.query.typeSearch;
-    console.log("typeSearch  ", typeSearch)
     const sql = "SELECT ambulatorio_id, body, `codice Ministeriale`, `codice interno`, data, descrizione, esami_selezionati.id, name FROM `esami_selezionati` JOIN esami JOIN ambulatori WHERE esami_selezionati.id_esame = esami.id and ambulatorio_id = ambulatori.id";
-    console.log(sql)
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: err});
@@ -94,8 +89,8 @@ app.get('/esami_selezionati', (req, res) => {
 })
 
 
-app.post('/insert/:id', (req, res) => {
-    const id = req.params.id;
+app.post('/insert', (req, res) => {
+    const id = req.body.params.id;
     const ambulatorio = req.body.params.ambulatorio;
     const sql = "INSERT INTO `esami_selezionati` (`id_esame`,`ambulatorio_id`) VALUES " + "(\'" + id + "\',\'"+ ambulatorio + "\')";
 
@@ -107,7 +102,7 @@ app.post('/insert/:id', (req, res) => {
     })
 })
 
-app.delete('/delete/:id', (req, res) => {
+app.delete('/delete', (req, res) => {
     const id = req.params.id;
     const sql = "delete from esami_selezionati where esami_selezionati.id = " + id;
 
