@@ -71,7 +71,7 @@ app.get('/exams', (req, res) => {
 app.get('/search', (req, res) => {
     const text = req.query.text;
     const typeSearch = req.query.typeSearch;
-    const sql = "SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and " + "`" + typeSearch +  "`" + " LIKE " + "\'%" + text + "%\'";
+    const sql = "SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and " + "`" + typeSearch +  "`" + " LIKE " + "\'%" + text + "%\' ORDER by esami.id";
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: err});
