@@ -39,10 +39,10 @@ app.get('/ambulatori', (req, res) => {
 // get body part by ambulatorio id
 app.get('/body', (req, res) => {
     const q =  req.query.id;
-    let esameDesc = ""
+    let esameSearchTextQuery = ""
     if(req.query.searchText)
-     esameDesc = ' and esami.`'+ req.query.searchType  + "` LIKE " + "\'%" + req.query.searchText  + "%\'" ;
-    const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id = ' + q + esameDesc;
+        esameSearchTextQuery = ' and esami.`'+ req.query.searchType  + "` LIKE " + "\'%" + req.query.searchText  + "%\'";
+    const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id = ' + q + esameSearchTextQuery;
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: "Error"});
@@ -55,8 +55,10 @@ app.get('/body', (req, res) => {
 app.get('/exams', (req, res) => {
     const q =  req.query.id
     const bd =  req.query.id_bd ? req.query.id_bd : "1";
-
-    const sql = 'SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id =' + q + '  and `parti corpo`.id =' + bd;
+    let esameSearchTextQuery = ""
+    if(req.query.searchText)
+        esameSearchTextQuery = ' and esami.`'+ req.query.searchType  + "` LIKE " + "\'%" + req.query.searchText  + "%\'" ;
+    const sql = 'SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id =' + q + '  and `parti corpo`.id =' + bd + esameSearchTextQuery;
     db.query(sql, (err, data) => {
         if (err) {
             return res.json({Error: "Error"});
