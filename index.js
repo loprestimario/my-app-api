@@ -102,7 +102,7 @@ app.post('/insert', (req, res) => {
     })
 })
 
-app.delete('/delete', (req, res) => {
+app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
     const sql = "delete from esami_selezionati where esami_selezionati.id = " + id;
 
