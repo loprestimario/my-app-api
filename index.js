@@ -3,12 +3,9 @@ import mysql from 'mysql';
 import cors from 'cors';
 
 
-
-
 const app = express();
 
 app.use(express.json());
-
 
 const corsOptions = {
     origin: '*',
@@ -17,28 +14,8 @@ const corsOptions = {
     optionsSuccessStatus: 204,
 };
 
-
-
-
-
 app.use(cors(corsOptions));
 
-
-const db2 = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: "",
-    database: 'test',
-})
-
-const db22 = mysql.createConnection({
-    host: 'kcpgm0ka8vudfq76.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
-    user: 'bu85hizl1m472sbb',
-    password: "h3ez5n4iyfhqe20f",
-    database: 'ftlbdo6z7a2rttg2',
-})
-
-//mysql://bu85hizl1m472sbb:h3ez5n4iyfhqe20f@kcpgm0ka8vudfq76.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/ftlbdo6z7a2rttg2
 
 const db = mysql.createConnection({
     host: 'sql5.freesqldatabase.com',
@@ -47,17 +24,6 @@ const db = mysql.createConnection({
     database: 'sql5757449',
 })
 
-app.get('/', (req, res) => {
-    console.log("reeeeeeeee" ,req.query.id)
-    const q =  req.query.id
-    const sql = 'SELECT * FROM ambulatori where id = ' + q;
-    db.query(sql, (err, data) => {
-        if (err) {
-            return res.json({Error: "Error"});
-        }
-        return res.json(data);
-    })
-})
 
 // all ambulatori
 app.get('/ambulatori', (req, res) => {
@@ -72,12 +38,10 @@ app.get('/ambulatori', (req, res) => {
 
 // get body part by ambulatorio id
 app.get('/body', (req, res) => {
-    console.log("reeeeeeeee" ,req.query.id)
     const q =  req.query.id;
     let esameDesc = ""
     if(req.query.searchText)
      esameDesc = ' and esami.descrizione ' + " LIKE " + "\'%" + req.query.searchText  + "%\'" ;
-    // const sql = 'SELECT * FROM `amb_esam` JOIN ambulatori JOIN esami WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and ambulatori.id = ' + q;
     const sql = 'SELECT distinct `parti corpo`.id , nome FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id = ' + q + esameDesc;
     db.query(sql, (err, data) => {
         if (err) {
@@ -89,12 +53,9 @@ app.get('/body', (req, res) => {
 
 // get exam  by bodypart
 app.get('/exams', (req, res) => {
-    console.log("get exam  by bodypart id" ,req.query.id)
     const q =  req.query.id
     const bd =  req.query.id_bd ? req.query.id_bd : "1";
-    console.log("get exam  by bodypart bd" ,req.query.id_bd)
 
-    // const sql = 'SELECT * FROM `amb_esam` JOIN ambulatori JOIN esami WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and ambulatori.id = ' + q;
     const sql = 'SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and ambulatori.id =' + q + '  and `parti corpo`.id =' + bd;
     db.query(sql, (err, data) => {
         if (err) {
@@ -108,7 +69,6 @@ app.get('/exams', (req, res) => {
 app.get('/search', (req, res) => {
     const codiceMin = req.query.id;
     const typeSearch = req.query.typeSearch;
-    console.log("typeSearch  ", typeSearch)
     const sql = "SELECT distinct * FROM `amb_esam` JOIN ambulatori JOIN esami JOIN `parti corpo` WHERE ambulatori.id=amb_esam.id_amb and esami.id=amb_esam.id_esame and esami.body = `parti corpo`.id and " + "`" + typeSearch +  "`" + " LIKE " + "\'%" + codiceMin + "%\'";
     console.log(sql)
     db.query(sql, (err, data) => {
@@ -123,7 +83,7 @@ app.get('/esami_selezionati', (req, res) => {
     const codiceMin = req.query.id;
     const typeSearch = req.query.typeSearch;
     console.log("typeSearch  ", typeSearch)
-    const sql = "SELECT * FROM `esami_selezionati` JOIN esami JOIN ambulatori WHERE esami_selezionati.id_esame = esami.id and ambulatorio = ambulatori.id";
+    const sql = "SELECT ambulatorio_id, body, `codice Ministeriale`, `codice interno`, data, descrizione, esami_selezionati.id, name FROM `esami_selezionati` JOIN esami JOIN ambulatori WHERE esami_selezionati.id_esame = esami.id and ambulatorio_id = ambulatori.id";
     console.log(sql)
     db.query(sql, (err, data) => {
         if (err) {
@@ -136,7 +96,8 @@ app.get('/esami_selezionati', (req, res) => {
 
 app.post('/insert/:id', (req, res) => {
     const id = req.params.id;
-    const sql = "INSERT INTO `esami_selezionati` (`id_esame`) VALUES " + "(\'" + id + "\')";
+    const ambulatorio = req.body.params.ambulatorio;
+    const sql = "INSERT INTO `esami_selezionati` (`id_esame`,`ambulatorio_id`) VALUES " + "(\'" + id + "\',\'"+ ambulatorio + "\')";
 
     db.query(sql, (err, data) => {
         if (err) {
@@ -148,7 +109,7 @@ app.post('/insert/:id', (req, res) => {
 
 app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
-    const sql = "delete from esami_selezionati where esami_selezionati.id_esame = " + id;
+    const sql = "delete from esami_selezionati where esami_selezionati.id = " + id;
 
     db.query(sql,(err, data) => {
         if (err) {
@@ -158,21 +119,6 @@ app.delete('/delete/:id', (req, res) => {
     })
 })
 
-app.post('/update/:id', (req, res) => {
-    const sql = 'UPDATE prova set nome="444"';
-    const values = [
-        req.body.nome,
-        req.body.cognome,
-        req.body.stato
-    ]
-
-    db.query(sql, [values],(err, data) => {
-        if (err) {
-            return res.json({Error: "Error"});
-        }
-        return res.json(data)
-    })
-})
 
 app.listen(process.env.PORT || 3040, () => {
     console.log("Server started on port 3000");
